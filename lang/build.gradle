@@ -14,11 +14,26 @@
 
 // Documentation for using Gradle with Kotlin is here: https://kotlinlang.org/docs/reference/using-gradle.html
 
+buildscript {
+    dependencies {
+ 	    // for maven-publish-auth plugin
+ 	    classpath 'org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1'
+    }
+    repositories {
+        maven {
+            url "http://repository.jboss.org/nexus/content/groups/public/"
+        }
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
 plugins {
     // https://docs.gradle.org/current/userguide/java_library_plugin.html#header
     id 'java-library'
     // https://docs.gradle.org/5.0/userguide/publishing_maven.html#header
     id 'maven-publish'
+    id 'org.hibernate.build.maven-repo-auth' version '3.0.2'   //need 
     id 'org.jetbrains.dokka' version '0.9.18'
     id 'org.jetbrains.kotlin.jvm'
     id 'io.gitlab.arturbosch.detekt'
@@ -103,6 +118,41 @@ publishing {
                 }
             }
         }
+        mavenJava(MavenPublication) {
+            // group id and version are set in the root build.gradle for all projects.
+            artifactId = "partiql-lang-kotlin"
+
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom {
+                name = "PartiQL Lang Kotlin"
+                packaging = "jar"
+                url = "https://partiql.org/"
+                description = "An implementation of PartiQL for the JVM written in Kotlin."
+                scm {
+                    connection = "scm:git@github.com:partiql/partiql-lang-kotlin.git"
+                    developerConnection = "scm:git@github.com:partiql/partiql-lang-kotlin.git"
+                    url = "git@github.com:partiql/partiql-lang-kotlin.git"
+                }
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        name = "Amazon Ion Team"
+                        email = "ion-team@amazon.com"
+                        organization = "PartiQL"
+                        organizationUrl = "https://github.com/partiql"
+                    }
+                }
+            }
+        }
+
     }
     repositories {
         maven {
@@ -111,6 +161,14 @@ publishing {
                 username ossrhUsername
                 password ossrhPassword
             }
+        }
+        maven {
+            name "navercorp.release"
+            url "http://repo.navercorp.com/content/repositories/maven2"
+        }
+        maven {
+            name "navercorp.snapshot"
+            url "http://repo.navercorp.com/content/repositories/m2-snapshot-repository"
         }
     }
 }
