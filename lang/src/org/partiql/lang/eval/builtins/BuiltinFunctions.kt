@@ -18,6 +18,7 @@ import org.partiql.lang.eval.*
 
 internal fun createBuiltinFunctions(valueFactory: ExprValueFactory) =
     listOf(
+        AbsExprFunction(valueFactory),
         createUpper(valueFactory),
         createLower(valueFactory),
         createExists(valueFactory),
