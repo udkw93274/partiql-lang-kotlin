@@ -33,6 +33,7 @@ internal fun createBuiltinFunctions(valueFactory: ExprValueFactory) =
         TrimExprFunction(valueFactory),
         ToStringExprFunction(valueFactory),
         ToTimestampExprFunction(valueFactory),
+        AbsExprFunction(valueFactory),
         SizeExprFunction(valueFactory))
 
 
