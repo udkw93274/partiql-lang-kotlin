@@ -99,6 +99,22 @@ internal class ReplaceExprFunction(valueFactory: ExprValueFactory): NullPropagat
     }
 }
 
+internal class ConcatExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("concat", (2..5), valueFactory) {
+    override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
+        var result:String = "";
+        var index = 0;
+        for (i in args) {
+            index++;
+            if (i.type != ExprValueType.STRING) {
+                errNoContext("Argument "+index+" of concat was not STRING.",
+                                                                                internal = false)
+            }
+            result+=i.stringValue();
+        }
+        return valueFactory.newString(result)
+    }
+}
+
 internal class NumbytesExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("numbytes", 1, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         val inputString = extractArguments(args)
@@ -117,7 +133,7 @@ internal class NumbytesExprFunction(valueFactory: ExprValueFactory): NullPropaga
 
 internal class NewuuidExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("newuuid", 0, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        var one: UUID? = UUID.randomUUID()
-        return valueFactory.newString(one.toString())
+        var uuid: UUID? = UUID.randomUUID()
+        return valueFactory.newString(uuid.toString())
     }
 }
