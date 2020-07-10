@@ -40,8 +40,17 @@ class StringEvaluationTest : EvaluatorTestBase() {
     fun replace() = assertEval("replace('abcb', 'b', 'xx')", "\"axxcxx\"")
 
     @Test
+    fun concat() = assertEval("concat('aa', 'bb', 'cc', 'dd')", "\"aabbccdd\"")
+
+    @Test
     fun numbytes() = assertEval("numbytes('abcb')", "4")
     
     @Test
     fun numbytesNone() = assertEval("numbytes('')", "0")
+
+    @Test
+    fun uuidLength() = assertEval("char_length(newuuid())", "36")
+    
+    @Test
+    fun uuidNotSame() = assertEval("newuuid() != newuuid()", "true")
 }

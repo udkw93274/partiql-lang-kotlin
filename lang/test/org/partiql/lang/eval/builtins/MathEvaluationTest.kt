@@ -17,7 +17,7 @@ package org.partiql.lang.eval.builtins
 import org.junit.*
 import org.partiql.lang.eval.*
 
-class AbsEvaluationTest : EvaluatorTestBase() {
+class MathEvaluationTest : EvaluatorTestBase() {
     @Test
     fun absInteger() = assertEval("abs(-1)", "1")
     
@@ -40,58 +40,68 @@ class AbsEvaluationTest : EvaluatorTestBase() {
     fun ceilFloat() = assertEval("ceil(0.1)", "1")
 
     @Test
+    fun floorInteger() = assertEval("floor(1)", "1")
+
+    @Test
     fun floorFloat() = assertEval("floor(1.234567890)", "1")
 
     @Test
-    fun trunc() = assertEval("trunc(1.23, 1)", "1.2e0")
+    fun roundInteger() = assertEval("round(5)", "5")
+    
+    @Test
+    fun roundFloatUp() = assertEval("round(0.5)", "1")
+    
+    @Test
+    fun roundFloatDown() = assertEval("round(0.4)", "0")
 
     @Test
-    fun trunc2() = assertEval("trunc(1.234567890, 0)", "1e0")
+    fun truncNormal() = assertEval("trunc(1.23, 1)", "1.2e0")
 
     @Test
-    fun trunc3() = assertEval("trunc(2.00, 5)", "2e0")
+    fun truncZero() = assertEval("trunc(1.234567890, 0)", "1e0")
 
     @Test
-    fun roundFloat() = assertEval("round(0.5)", "1")
+    fun truncFloat() = assertEval("trunc(2.00, 5)", "2e0")
+    
+    @Test
+    fun truncInt() = assertEval("trunc(2, 5)", "2")
 
     @Test
     fun mod() = assertEval("mod(10, 3)", "1")
 
-    @Test
-    fun nanvl1() = assertEval("nanvl(1.1, 3)", "1.1")
+    // @Test
+    // fun modZero() = assertEval("mod(10, 0)", "1") => error test case setting
 
-    @Test
-    fun nanvl2() = assertEval("nanvl('s', 3)", "3")
-    
     @Test
     fun sqrt() = assertEval("sqrt(9)", "3e0")
-
+    
     @Test
-    fun ln() = assertEval("ln(10)", "2.302585092994046e0")
-
-    @Test
-    fun exp() = assertEval("exp(0)", "1e0")
+    fun sqrtFloat() = assertEval("sqrt(1.44)", "1.2e0")
 
     @Test
     fun power() = assertEval("power(10, 2)", "100e0")
 
     @Test
+    fun powerNegative() = assertEval("power(10, -1)", "0.1e0")
+
+    @Test
     fun log() = assertEval("log(100, 10)", "2e0")
 
-
+    @Test
+    fun exp() = assertEval("exp(0)", "1e0")
+    
+    @Test
+    fun ln() = assertEval("ln(10)", "2.302585092994046e0")
 
     @Test
-    fun startsWith() = assertEval("startswith('abcd', 'ab')", "true")
+    fun nanvlNumber() = assertEval("nanvl(1.1, 3)", "1.1")
 
     @Test
-    fun endsWith() = assertEval("endswith('abcd', 'cd')", "true")
+    fun nanvlNAN() = assertEval("nanvl('s', 3)", "3")
 
     @Test
-    fun indexOf() = assertEval("indexof('abcd', 'bc')", "1")
+    fun randomRange() = assertEval("(rand() <= 1) and (rand() >= 0)", "true")
 
     @Test
-    fun replace() = assertEval("replace('abcb', 'b', 'xx')", "\"axxcxx\"")
-
-    @Test
-    fun numbytes() = assertEval("numbytes('abcb')", "4")
+    fun randomNotSame() = assertEval("rand() != rand()", "true")
 }

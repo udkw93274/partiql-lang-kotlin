@@ -34,14 +34,15 @@ internal fun createBuiltinFunctions(valueFactory: ExprValueFactory) =
         SqrtExprFunction(valueFactory),
         PowerExprFunction(valueFactory),
         LogExprFunction(valueFactory),
-        LnExprFunction(valueFactory),
         ExpExprFunction(valueFactory),
+        LnExprFunction(valueFactory),
         NanvlExprFunction(valueFactory),
         RandExprFunction(valueFactory),        
         StartsWithExprFunction(valueFactory),
         EndsWithExprFunction(valueFactory),
         IndexOfExprFunction(valueFactory),
         ReplaceExprFunction(valueFactory),
+        ConcatExprFunction(valueFactory),
         NumbytesExprFunction(valueFactory),
         NewuuidExprFunction(valueFactory),
         CoalesceExprFunction(valueFactory),
@@ -53,6 +54,8 @@ internal fun createBuiltinFunctions(valueFactory: ExprValueFactory) =
         TrimExprFunction(valueFactory),
         ToStringExprFunction(valueFactory),
         ToTimestampExprFunction(valueFactory),
+        UnixtimeToTimestampExprFunction(valueFactory),
+        TimestampToUnixtimeExprFunction(valueFactory),
         SizeExprFunction(valueFactory))
 
 
