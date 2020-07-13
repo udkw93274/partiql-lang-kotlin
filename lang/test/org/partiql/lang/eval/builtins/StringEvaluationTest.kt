@@ -44,6 +44,9 @@ class StringEvaluationTest : EvaluatorTestBase() {
 
     @Test
     fun numbytes() = assertEval("numbytes('abcb')", "4")
+
+    @Test
+    fun numbytesSpecial() = assertEval("numbytes('∀')", "3")
     
     @Test
     fun numbytesNone() = assertEval("numbytes('')", "0")

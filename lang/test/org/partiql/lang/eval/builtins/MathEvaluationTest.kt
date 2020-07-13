@@ -62,6 +62,13 @@ class MathEvaluationTest : EvaluatorTestBase() {
 
     @Test
     fun truncFloat() = assertEval("trunc(2.00, 5)", "2e0")
+
+    @Test
+    fun truncSecondFloat() = assertEval("trunc(2.12, 1.2)", "2.1e0")
+
+
+    @Test
+    fun truncSecondNegative() = assertEval("trunc(2.12, -1.2)", "2e0")
     
     @Test
     fun truncInt() = assertEval("trunc(2, 5)", "2")

@@ -19,14 +19,14 @@ import org.partiql.lang.eval.*
 
 class UnixTimeEvaluationTest : EvaluatorTestBase() {
     @Test
-    fun TimestampToUnixtime() = assertEval("timestamp_to_unixtime(`2016-12-15T18:07:31.155Z`)", "1481825251155")
+    fun UnixtimeToTimeString() = assertEval("unixtime_to_string(1594579192000, 'yyyy MM dd hh:mm:ss z', 'Asia/Seoul')", "\"2020 07 13 03:39:52 KST\"")
 
     @Test
-    fun UnixtimeToTimestamp() = assertEval("unixtime_to_timestamp(1481825251155)", "2016-12-15T18:07:31.155Z")
+    fun UnixtimeToTimeStringUTC() = assertEval("unixtime_to_string(1594579192000, 'hh:mm:ss z')", "\"06:39:52 UTC\"")
 
     @Test
-    fun ConvertReverse() = assertEval("timestamp_to_unixtime(unixtime_to_timestamp(1481825251155))", "1481825251155")
-    
+    fun TimeStringToUnixtime() = assertEval("string_to_unixtime('2020 07 13 03:39:52 KST', 'yyyy MM dd hh:mm:ss z', 'Asia/Seoul')", "1594579192000")
+
     @Test
-    fun ConvertReverse2() = assertEval("unixtime_to_timestamp(timestamp_to_unixtime(`2016-12-15T18:07:31.155Z`))", "2016-12-15T18:07:31.155Z")
+    fun TimeStringToUnixtimeUTC() = assertEval("string_to_unixtime('2020 07 13 06:39:52.222', 'yyyy MM dd hh:mm:ss.SSS')", "1594622392222")
 }

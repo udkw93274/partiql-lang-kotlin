@@ -86,6 +86,7 @@ internal class TruncExprFunction(valueFactory: ExprValueFactory): NullPropagatin
         val firstValue = args[0].numberValue()
         val secondType = args[1].type
         val secondValue = args[1].numberValue()
+        var validSecondValue = secondValue.toDouble();
 
         when {
             firstType.isNumber == false                   -> errNoContext("Argument 1 of trunc was not Number.",
@@ -94,11 +95,18 @@ internal class TruncExprFunction(valueFactory: ExprValueFactory): NullPropagatin
                                                                                 internal = false)
         }
 
-        val divider = Math.pow(10.0, secondValue.toDouble())
+        when {
+            validSecondValue < 0                  -> validSecondValue = 0.0
+            secondType != ExprValueType.INT       -> validSecondValue = floor(validSecondValue)
+
+        }
+
+        val divider = Math.pow(10.0, validSecondValue)
 
         return when (firstType) {
             ExprValueType.INT -> args[0]
             ExprValueType.DECIMAL, ExprValueType.FLOAT -> valueFactory.newFloat(floor(firstValue.toDouble() * divider)/divider)
+
             else -> errNoContext("Argument 1 of trunc was not Number.", internal = false)
         }
     }

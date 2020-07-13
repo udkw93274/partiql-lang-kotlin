@@ -54,8 +54,9 @@ internal fun createBuiltinFunctions(valueFactory: ExprValueFactory) =
         TrimExprFunction(valueFactory),
         ToStringExprFunction(valueFactory),
         ToTimestampExprFunction(valueFactory),
-        UnixtimeToTimestampExprFunction(valueFactory),
-        TimestampToUnixtimeExprFunction(valueFactory),
+        UnixtimeToStringExprFunction(valueFactory),
+        StringToUnixtimeExprFunction(valueFactory),
+        UnixtimeNowExprFunction(valueFactory),
         SizeExprFunction(valueFactory))
 
 
