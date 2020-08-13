@@ -56,4 +56,28 @@ class StringEvaluationTest : EvaluatorTestBase() {
     
     @Test
     fun uuidNotSame() = assertEval("newuuid() != newuuid()", "true")
+
+    @Test
+    fun ltrim() = assertEval("ltrim('  abc  ')", "\"abc  \"")
+
+    @Test
+    fun rtrim() = assertEval("rtrim('  abc  ')", "\"  abc\"")
+
+    @Test
+    fun lpad() = assertEval("lpad('abc', 2)", "\"  abc\"")
+
+    @Test
+    fun rpad() = assertEval("rpad('abc', 2, 'cd')", "\"abccdcd\"")
+
+    @Test
+    fun getitemList() = assertEval("get_item(`[1, 2, 3]`, 1)", "2")
+    
+    @Test
+    fun getitemListString() = assertEval("get_item(`[1, \"2\", 3]`, 1)", "\"2\"")
+    
+    @Test
+    fun getitemKeyValue() = assertEval("get_item(`{foo: \"bar\", a:\"b\"}`, 'foo')", "\"bar\"")
+    
+    @Test
+    fun getitemString() = assertEval("get_item('abcde', 2)", "\"c\"")
 }

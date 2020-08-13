@@ -40,7 +40,7 @@ internal class ExtractExprFunction(valueFactory: ExprValueFactory) : NullPropaga
 
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         val datePart = args[0].datePartValue()
-        val timestamp = args[1].timestampValue()
+        val timestamp = unixTimeToScalaTimestamp(args[1], "extract", 2)
 
         val extracted = when (datePart) {
             DatePart.YEAR            -> timestamp.year

@@ -49,14 +49,22 @@ internal fun createBuiltinFunctions(valueFactory: ExprValueFactory) =
         DateAddExprFunction(valueFactory),
         DateDiffExprFunction(valueFactory),
         ExtractExprFunction(valueFactory),
+        AddTimeExprFunction(valueFactory),
+        DiffTimeExprFunction(valueFactory),
         NullIfExprFunction(valueFactory),
+        IsNullExprFunction(valueFactory),
         SubstringExprFunction(valueFactory),
         TrimExprFunction(valueFactory),
+        LtrimExprFunction(valueFactory),
+        RtrimExprFunction(valueFactory),
+        LpadExprFunction(valueFactory),
+        RpadExprFunction(valueFactory),
         ToStringExprFunction(valueFactory),
         ToTimestampExprFunction(valueFactory),
         UnixtimeToStringExprFunction(valueFactory),
         StringToUnixtimeExprFunction(valueFactory),
         UnixtimeNowExprFunction(valueFactory),
+        GetItemExprFunction(valueFactory),
         SizeExprFunction(valueFactory))
 
 
