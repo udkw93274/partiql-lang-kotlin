@@ -29,4 +29,19 @@ class UnixTimeEvaluationTest : EvaluatorTestBase() {
 
     @Test
     fun TimeStringToUnixtimeUTC() = assertEval("string_to_unixtime('2020 07 13 06:39:52.222', 'yyyy MM dd hh:mm:ss.SSS')", "1594622392222")
+
+    @Test
+    fun Extract() = assertEval("extract(HOUR FROM 1594579192031)", "18")
+
+    @Test
+    fun DateDIFF() = assertEval("DIFF_TIME(SECOND, 1594579192031, 1594579198031)", "6")
+
+    @Test
+    fun Add() = assertEval("ADD_TIME(minute, -10, 1594579198031)", "1594578598031")
+        
+    @Test
+    fun isnull() = assertEval("isnull('a')", "false")
+
+    @Test
+    fun isnullNotNull() = assertEval("isnull(NULL)", "true")
 }

@@ -99,8 +99,9 @@ internal class ReplaceExprFunction(valueFactory: ExprValueFactory): NullPropagat
     }
 }
 
-internal class ConcatExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("concat", (2..5), valueFactory) {
-    override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
+internal class ConcatExprFunction(private val valueFactory: ExprValueFactory): ExprFunction {
+    override val name = "concat"
+    override fun call(env: Environment, args: List<ExprValue>): ExprValue {
         var result:String = "";
         var index = 0;
         for (i in args) {
@@ -135,5 +136,80 @@ internal class NewuuidExprFunction(valueFactory: ExprValueFactory): NullPropagat
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         var uuid: UUID? = UUID.randomUUID()
         return valueFactory.newString(uuid.toString())
+    }
+}
+
+internal class LtrimExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("ltrim", 1, valueFactory) {
+    override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
+
+        when {
+            args[0].type != ExprValueType.STRING                -> errNoContext("Argument 1 of ltrim was not STRING.",
+                                                                                internal = false)
+        }
+        return valueFactory.newString(args[0].stringValue().trimStart())
+    }
+}
+
+internal class RtrimExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("rtrim", 1, valueFactory) {
+    override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
+
+        when {
+            args[0].type != ExprValueType.STRING                -> errNoContext("Argument 1 of rtrim was not STRING.",
+                                                                                internal = false)
+        }
+        return valueFactory.newString(args[0].stringValue().trimEnd())
+    }
+}
+
+internal class LpadExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("lpad", 2..3, valueFactory) {
+    override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
+        var (targetString, padNumber, padString) = extractArguments(args)
+        var tempString = ""
+        for (i in 1..padNumber){
+            tempString+=padString
+        }
+        return valueFactory.newString(tempString+targetString)
+    }
+
+    private fun extractArguments(args: List<ExprValue>): Triple<String, Int, String> {
+        when {
+            args[0].type != ExprValueType.STRING                -> errNoContext("Argument 1 of lpad was not STRING.",
+                                                                                internal = false)
+            args[1].type != ExprValueType.INT                -> errNoContext("Argument 2 of lpad was not INTEGER.",
+                                                                                internal = false)
+            args.size == 3 && args[2].type != ExprValueType.STRING                -> errNoContext("Argument 3 of lpad was not STRING.",
+                                                                                internal = false)                                                                    
+        }
+        if (args.size == 3){
+            return Triple(args[0].stringValue(), args[1].intValue(), args[2].stringValue())
+        } else {
+            return Triple(args[0].stringValue(), args[1].intValue(), " ")
+        }
+    }
+}
+
+internal class RpadExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("rpad", 2..3, valueFactory) {
+    override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
+        var (targetString, padNumber, padString) = extractArguments(args)
+        var tempString = ""
+        for (i in 1..padNumber){
+            tempString+=padString
+        }
+        return valueFactory.newString(targetString+tempString)
+    }
+    private fun extractArguments(args: List<ExprValue>): Triple<String, Int, String> {
+        when {
+            args[0].type != ExprValueType.STRING                -> errNoContext("Argument 1 of rpad was not STRING.",
+                                                                                internal = false)
+            args[1].type != ExprValueType.INT                -> errNoContext("Argument 2 of rpad was not INTEGER.",
+                                                                                internal = false)
+            args.size == 3 && args[2].type != ExprValueType.STRING                -> errNoContext("Argument 3 of rpad was not STRING.",
+                                                                                internal = false)                                                                    
+        }
+        if (args.size == 3){
+            return Triple(args[0].stringValue(), args[1].intValue(), args[2].stringValue())
+        } else {
+            return Triple(args[0].stringValue(), args[1].intValue(), " ")
+        }
     }
 }
