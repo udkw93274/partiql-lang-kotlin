@@ -18,7 +18,6 @@ import com.amazon.ion.*
 import org.partiql.lang.errors.*
 import org.partiql.lang.eval.*
 import org.partiql.lang.util.*
-import com.amazon.ion.IonStruct
 
 /**
  * Built in function to return the size of a container type, i.e. size of Lists, Structs and Bags. This function

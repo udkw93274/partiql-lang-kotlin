@@ -66,7 +66,6 @@ class MathEvaluationTest : EvaluatorTestBase() {
     @Test
     fun truncSecondFloat() = assertEval("trunc(2.12, 1.2)", "2.1e0")
 
-
     @Test
     fun truncSecondNegative() = assertEval("trunc(2.12, -1.2)", "2e0")
     
@@ -75,9 +74,6 @@ class MathEvaluationTest : EvaluatorTestBase() {
 
     @Test
     fun mod() = assertEval("mod(10, 3)", "1")
-
-    // @Test
-    // fun modZero() = assertEval("mod(10, 0)", "1") => error test case setting
 
     @Test
     fun sqrt() = assertEval("sqrt(9)", "3e0")
@@ -111,4 +107,19 @@ class MathEvaluationTest : EvaluatorTestBase() {
 
     @Test
     fun randomNotSame() = assertEval("rand() != rand()", "true")
+    
+    @Test
+    fun bitor() = assertEval("bitor(8,5)", "13")
+
+    @Test
+    fun bitand() = assertEval("bitand(13, 5)", "5")
+
+    @Test
+    fun bitxor() = assertEval("bitxor(13,5)", "8")
+
+    @Test
+    fun sin() = assertEval("sin(1)", "0.8414709848078965e0")
+
+    @Test
+    fun cosh() = assertEval("cosh(100)", "1.3440585709080678E43")
 }
