@@ -28,23 +28,18 @@ import java.time.*
 private const val SECONDS_PER_MINUTE = 60
 
 internal class UnixtimeToStringExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("unixtime_to_string", (2..3), valueFactory) {
-    override fun eval(env: Environment, args: List<ExprValue>): ExprValue {        
-        val firstType = args[0].type
-        val firstValue = args[0].numberValue()
-        val secondType = args[1].type
-        val secondValue = args[1].stringValue()
-        
+    override fun eval(env: Environment, args: List<ExprValue>): ExprValue {                
         when {
-            firstType != ExprValueType.INT                         -> errNoContext("Argument 1 of unixtime_to_string was not INT.",
+            args[0].type != ExprValueType.INT                         -> errNoContext("Argument 1 of unixtime_to_string was not INT.",
                                                                                 internal = false)
-            secondType != ExprValueType.STRING                     -> errNoContext("Argument 2 of unixtime_to_string was not STRING.",
+            args[1].type != ExprValueType.STRING                      -> errNoContext("Argument 2 of unixtime_to_string was not STRING.",
                                                                                 internal = false)
             args.size > 2 && args[2].type != ExprValueType.STRING  -> errNoContext("Argument 3 of unixtime_to_string was not STRING.",
                                                                                 internal = false)
         }
         
-        var date = Date(firstValue.toLong()); 
-        var jdf = SimpleDateFormat(secondValue);
+        var date = Date(args[0].numberValue().toLong()); 
+        var jdf = SimpleDateFormat(args[1].stringValue());
 
         if (args.size > 2) {
             jdf.setTimeZone(TimeZone.getTimeZone(args[2].stringValue()));
@@ -56,29 +51,24 @@ internal class UnixtimeToStringExprFunction(valueFactory: ExprValueFactory): Nul
 }
 
 internal class StringToUnixtimeExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("string_to_unixtime", (2..3), valueFactory) {
-    override fun eval(env: Environment, args: List<ExprValue>): ExprValue {        
-        val firstType = args[0].type
-        val firstValue = args[0].stringValue()
-        val secondType = args[1].type
-        val secondValue = args[1].stringValue()
-        
+    override fun eval(env: Environment, args: List<ExprValue>): ExprValue {              
         when {
-            firstType != ExprValueType.STRING                      -> errNoContext("Argument 1 of string_to_unixtime was not STRING.",
+            args[0].type != ExprValueType.STRING                      -> errNoContext("Argument 1 of string_to_unixtime was not STRING.",
                                                                                 internal = false)
-            secondType != ExprValueType.STRING                     -> errNoContext("Argument 2 of string_to_unixtime was not STRING.",
+            args[1].type != ExprValueType.STRING                      -> errNoContext("Argument 2 of string_to_unixtime was not STRING.",
                                                                                 internal = false)
             args.size > 2 && args[2].type != ExprValueType.STRING  -> errNoContext("Argument 3 of string_to_unixtime was not STRING.",
                                                                                 internal = false)
         }
 
         try {
-            var jdf = SimpleDateFormat(secondValue);
+            var jdf = SimpleDateFormat(args[1].stringValue());
             if (args.size > 2) {
                 jdf.setTimeZone(TimeZone.getTimeZone(args[2].stringValue()));
             } else {
                 jdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             }
-			var date = jdf.parse(firstValue);
+			var date = jdf.parse(args[0].stringValue());
             var timestamp = date.getTime();
             return valueFactory.newInt(timestamp)
 		} catch (ex: Exception) {
@@ -279,17 +269,3 @@ internal class IsNullExprFunction(private val valueFactory: ExprValueFactory) : 
         }
     }
 }
-
-// internal class UnixtimeToTimestampExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("unixtime_to_timestamp", 1, valueFactory) {
-//     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-//         val firstType = args[0].type
-//         val firstValue = args[0].numberValue()
-        
-//         when {
-//             firstType != ExprValueType.INT                   -> errNoContext("Argument 1 of unixtime_to_timestamp was not INT.",
-//                                                                                 internal = false)
-//         }
-//         val time = DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(firstValue.toLong()))
-//         return valueFactory.newTimestamp(Timestamp.valueOf( time.toString() ) )
-//     }
-// }
