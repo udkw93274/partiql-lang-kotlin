@@ -22,109 +22,78 @@ import com.amazon.ion.*
 
 internal class StartsWithExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("startswith", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val compareType = args[1].type
-        val compareString = args[1].stringValue()
-
         return when {
-            targetType != ExprValueType.STRING                 -> errNoContext("Argument 1 of startswith was not STRING.",
+            args[0].type != ExprValueType.STRING                 -> errNoContext("Argument 1 of startswith was not STRING.",
                                                                                 internal = false)
-            compareType != ExprValueType.STRING                -> errNoContext("Argument 2 of startswith was not STRING.",
+            args[1].type != ExprValueType.STRING                 -> errNoContext("Argument 2 of startswith was not STRING.",
                                                                                 internal = false)
-            else -> valueFactory.newBoolean(targetString.startsWith(compareString))
+            else -> valueFactory.newBoolean(args[0].stringValue().startsWith(args[1].stringValue()))
         }
     }
 }
 
 internal class EndsWithExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("endswith", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val compareType = args[1].type
-        val compareString = args[1].stringValue()
-
         return when {
-            targetType != ExprValueType.STRING                 -> errNoContext("Argument 1 of endswith was not STRING.",
+            args[0].type != ExprValueType.STRING                 -> errNoContext("Argument 1 of endswith was not STRING.",
                                                                                 internal = false)
-            compareType != ExprValueType.STRING                -> errNoContext("Argument 2 of endswith was not STRING.",
+            args[1].type != ExprValueType.STRING                 -> errNoContext("Argument 2 of endswith was not STRING.",
                                                                                 internal = false)
-            else -> valueFactory.newBoolean(targetString.endsWith(compareString))
+            else -> valueFactory.newBoolean(args[0].stringValue().endsWith(args[1].stringValue()))
         }
     }
 }
 
 internal class IndexOfExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("indexof", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val compareType = args[1].type
-        val compareString = args[1].stringValue()
         return when {
-            targetType!= ExprValueType.STRING                  -> errNoContext("Argument 1 of indexof was not STRING.",
+            args[0].type!= ExprValueType.STRING                  -> errNoContext("Argument 1 of indexof was not STRING.",
                                                                                 internal = false)
-            compareType != ExprValueType.STRING                -> errNoContext("Argument 2 of indexof was not STRING.",
+            args[1].type != ExprValueType.STRING                 -> errNoContext("Argument 2 of indexof was not STRING.",
                                                                                 internal = false)
-            else -> valueFactory.newInt(targetString.indexOf(compareString))
+            else -> valueFactory.newInt(args[0].stringValue().indexOf(args[1].stringValue()))
         }
     }
 }
 
 internal class ReplaceExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("replace", 3, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val findStringType = args[1].type
-        val findString = args[1].stringValue()
-        val replaceStringType = args[2].type
-        val replaceString = args[2].stringValue()
         return when {
-            targetType != ExprValueType.STRING                       -> errNoContext("Argument 1 of replace was not STRING.",
+            args[0].type != ExprValueType.STRING                       -> errNoContext("Argument 1 of replace was not STRING.",
                                                                                 internal = false)
-            findStringType != ExprValueType.STRING                   -> errNoContext("Argument 2 of replace was not STRING.",
+            args[1].type != ExprValueType.STRING                       -> errNoContext("Argument 2 of replace was not STRING.",
                                                                                 internal = false)
-            replaceStringType != ExprValueType.STRING                -> errNoContext("Argument 3 of replace was not STRING.",
+            args[2].type != ExprValueType.STRING                       -> errNoContext("Argument 3 of replace was not STRING.",
                                                                                 internal = false)
-            else -> valueFactory.newString(targetString.replace(findString, replaceString))
+            else -> valueFactory.newString(args[0].stringValue().replace(args[1].stringValue(), args[2].stringValue()))
         } 
     }
 }
 
 internal class RegexpReplaceExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("regexp_replace", 3, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val findStringType = args[1].type
-        val findString = args[1].stringValue()
-        val replaceStringType = args[2].type
-        val replaceString = args[2].stringValue()
         return when {
-            targetType != ExprValueType.STRING                       -> errNoContext("Argument 1 of regexp_replace was not STRING.",
+            args[0].type != ExprValueType.STRING                       -> errNoContext("Argument 1 of regexp_replace was not STRING.",
                                                                                 internal = false)
-            findStringType != ExprValueType.STRING                   -> errNoContext("Argument 2 of regexp_replace was not STRING.",
+            args[1].type != ExprValueType.STRING                       -> errNoContext("Argument 2 of regexp_replace was not STRING.",
                                                                                 internal = false)
-            replaceStringType != ExprValueType.STRING                -> errNoContext("Argument 3 of regexp_replace was not STRING.",
+            args[2].type != ExprValueType.STRING                       -> errNoContext("Argument 3 of regexp_replace was not STRING.",
                                                                                 internal = false)
-            else -> valueFactory.newString(targetString.replace(findString.toRegex(), replaceString))
+            else -> valueFactory.newString(args[0].stringValue().replace(args[1].stringValue().toRegex(), args[2].stringValue()))
         } 
     }
 }
 
 internal class RegexpMatchesExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("regexp_matches", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val findStringType = args[1].type
-        val findString = args[1].stringValue()
-
         return when {
-            targetType != ExprValueType.STRING                       -> errNoContext("Argument 1 of regexp_matches was not STRING.",
+            args[0].type != ExprValueType.STRING                       -> errNoContext("Argument 1 of regexp_matches was not STRING.",
                                                                                 internal = false)
-            findStringType != ExprValueType.STRING                   -> errNoContext("Argument 2 of regexp_matches was not STRING.",
+            args[1].type != ExprValueType.STRING                       -> errNoContext("Argument 2 of regexp_matches was not STRING.",
                                                                                 internal = false)
             else -> {
-                val regex = findString.toRegex()
-                valueFactory.newBoolean(regex.containsMatchIn(targetString))
+                val regex = args[1].stringValue().toRegex()
+                valueFactory.newBoolean(regex.containsMatchIn(args[0].stringValue()))
             }
         } 
     }
@@ -132,18 +101,13 @@ internal class RegexpMatchesExprFunction(valueFactory: ExprValueFactory): NullPr
 
 internal class RegexpSubstrExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("regexp_substr", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val findStringType = args[1].type
-        val findString = args[1].stringValue()
-
         return when {
-            targetType != ExprValueType.STRING                       -> errNoContext("Argument 1 of regexp_substr was not STRING.",
+            args[0].type != ExprValueType.STRING                       -> errNoContext("Argument 1 of regexp_substr was not STRING.",
                                                                                 internal = false)
-            findStringType != ExprValueType.STRING                   -> errNoContext("Argument 2 of regexp_substr was not STRING.",
+            args[1].type != ExprValueType.STRING                       -> errNoContext("Argument 2 of regexp_substr was not STRING.",
                                                                                 internal = false)
             else -> {
-                val match = Regex(findString).find(targetString)!!
+                val match = Regex(args[1].stringValue()).find(args[0].stringValue())!!
                 valueFactory.newString(match.groupValues.get(0))
             }
         } 
@@ -218,61 +182,52 @@ internal class NewuuidExprFunction(valueFactory: ExprValueFactory): NullPropagat
     }
 }
 
-internal class LpadExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("lpad", 2..3, valueFactory) {
+internal class LeadingPadExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("leading_pad", 2..3, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val padNumberType = args[1].type
-        val padNumber = args[1].intValue()
-        var padString = " "
-
         when {
-            targetType != ExprValueType.STRING                      -> errNoContext("Argument 1 of lpad was not STRING.",
+            args[0].type != ExprValueType.STRING                      -> errNoContext("Argument 1 of leading_pad was not STRING.",
                                                                                 internal = false)
-            padNumberType != ExprValueType.INT                         -> errNoContext("Argument 2 of lpad was not INTEGER.",
+            args[1].type!= ExprValueType.INT                          -> errNoContext("Argument 2 of leading_pad was not INTEGER.",
                                                                                 internal = false)
-            args.size == 3 && args[2].type != ExprValueType.STRING    -> errNoContext("Argument 3 of lpad was not STRING.",
+            args.size == 3 && args[2].type != ExprValueType.STRING    -> errNoContext("Argument 3 of leading_pad was not STRING.",
                                                                                 internal = false)                                                                    
         }
         
+        var padString = " "
+
         if (args.size == 3) {
             padString = args[2].stringValue()
         }
 
         var t = ""
-        for (i in 1..padNumber){
+        for (i in 1..args[1].intValue()){
             t+=padString
         }
-        return valueFactory.newString(t+targetString)
+        return valueFactory.newString(t+args[0].stringValue())
     }
 }
 
-internal class RpadExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("rpad", 2..3, valueFactory) {
+internal class TrailingPadExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("trailing_pad", 2..3, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val padNumberType = args[1].type
-        val padNumber = args[1].intValue()
-        var padString = " "
-
         when {
-            targetType != ExprValueType.STRING                -> errNoContext("Argument 1 of rpad was not STRING.",
+            args[0].type != ExprValueType.STRING                -> errNoContext("Argument 1 of trailing_pad was not STRING.",
                                                                                 internal = false)
-            padNumberType != ExprValueType.INT                -> errNoContext("Argument 2 of rpad was not INTEGER.",
+            args[1].type != ExprValueType.INT                   -> errNoContext("Argument 2 of trailing_pad was not INTEGER.",
                                                                                 internal = false)
-            args.size == 3 && args[2].type != ExprValueType.STRING                -> errNoContext("Argument 3 of rpad was not STRING.",
+            args.size == 3 && args[2].type != ExprValueType.STRING                -> errNoContext("Argument 3 of trailing_pad was not STRING.",
                                                                                 internal = false)                                                                    
         }
+        var padString = " "
 
         if (args.size == 3) {
             padString = args[2].stringValue()
         }
 
         var t = "";
-        for (i in 1..padNumber){
+        for (i in 1..args[1].intValue()){
             t+=padString
         }
-        return valueFactory.newString(targetString+t)
+        return valueFactory.newString(args[0].stringValue()+t)
     }
 }
 
@@ -288,58 +243,48 @@ internal class ChrExprFunction(valueFactory: ExprValueFactory) : NullPropagating
 
 internal class EncodeExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("encode", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val encodeStringType = args[1].type
-        val encodeString = args[1].stringValue().toUpperCase()
-
         return when {
-            targetType != ExprValueType.STRING                      -> errNoContext("Argument 1 of encode was not STRING.",
+            args[0].type != ExprValueType.STRING                      -> errNoContext("Argument 1 of encode was not STRING.",
                                                                                 internal = false)
-            encodeStringType != ExprValueType.STRING                -> errNoContext("Argument 2 of encode was not STRING.",
+            args[1].type != ExprValueType.STRING                      -> errNoContext("Argument 2 of encode was not STRING.",
                                                                                 internal = false)
-            !(encodeString.equals("BASE64"))                        -> errNoContext("Argument 2 of encode must Base64.",
+            !(args[1].stringValue().toUpperCase().equals("BASE64"))   -> errNoContext("Argument 2 of encode must Base64.",
                                                                                 internal = false)
-            else -> valueFactory.newString(Base64.getEncoder().encodeToString(targetString.toByteArray()))
+            else -> valueFactory.newString(Base64.getEncoder().encodeToString(args[0].stringValue().toByteArray()))
         }
     }
 }
 
 internal class DecodeExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("decode", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val decodeStringType = args[1].type
-        val decodeString = args[1].stringValue().toUpperCase()
-
         return when {
-            targetType != ExprValueType.STRING                      -> errNoContext("Argument 1 of decode was not STRING.",
+            args[0].type != ExprValueType.STRING                      -> errNoContext("Argument 1 of decode was not STRING.",
                                                                                 internal = false)
-            decodeStringType != ExprValueType.STRING                -> errNoContext("Argument 2 of decode was not STRING.",
+            args[1].type != ExprValueType.STRING                      -> errNoContext("Argument 2 of decode was not STRING.",
                                                                                 internal = false)
-            !(decodeString.equals("BASE64"))                        -> errNoContext("Argument 2 of decode must Base64.",
+            !(args[1].stringValue().toUpperCase().equals("BASE64"))   -> errNoContext("Argument 2 of decode must Base64.",
                                                                                 internal = false)
-            else -> valueFactory.newString(String(Base64.getDecoder().decode(targetString)))
+            else -> valueFactory.newString(String(Base64.getDecoder().decode(args[0].stringValue())))
         }
     }
 }
 
-internal class EncryptExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("encrypt", 2, valueFactory) {
+internal class HashExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("hash", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val targetType = args[0].type
-        val targetString = args[0].stringValue()
-        val encryptStringType = args[1].type
-        val encryptString = args[1].stringValue().toUpperCase()
-        
+        when {
+            args[0].type != ExprValueType.STRING                      -> errNoContext("Argument 1 of hash was not STRING.",
+                                                                                internal = false)
+            args[1].type != ExprValueType.STRING                      -> errNoContext("Argument 2 of hash was not STRING.",
+                                                                                internal = false)
+        }
+
+        val hashType = args[1].stringValue().toUpperCase()
+
         return when {
-            targetType != ExprValueType.STRING                      -> errNoContext("Argument 1 of encrypt was not STRING.",
+            !(hashType.equals("MD2") || hashType.equals("MD5") || hashType.equals("SHA-1") || hashType.equals("SHA-224")
+            || hashType.equals("SHA-256") || hashType.equals("SHA-384") || hashType.equals("SHA-512"))                        -> errNoContext("Argument 2 of encrypt invalid encrypt type.",
                                                                                 internal = false)
-            encryptStringType != ExprValueType.STRING                -> errNoContext("Argument 2 of encrypt was not STRING.",
-                                                                                internal = false)
-            !(encryptString.equals("MD2") || encryptString.equals("MD5") || encryptString.equals("SHA-1") || encryptString.equals("SHA-224")
-            || encryptString.equals("SHA-256") || encryptString.equals("SHA-384") || encryptString.equals("SHA-512"))                        -> errNoContext("Argument 2 of encrypt invalid encrypt type.",
-                                                                                internal = false)
-            else -> valueFactory.newString(hashString(targetString, encryptString))
+            else -> valueFactory.newString(hashString(args[0].stringValue(), hashType))
         }
     }
 }
@@ -356,6 +301,5 @@ private fun hashString(targetString : String, encryptType: String): String {
         result.append(HEX_CHARS[i shr 4 and 0x0f])
         result.append(HEX_CHARS[i and 0x0f])
     }
-
     return result.toString()
 }
