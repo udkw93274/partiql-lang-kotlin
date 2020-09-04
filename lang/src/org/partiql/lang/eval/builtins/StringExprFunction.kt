@@ -15,6 +15,8 @@
 package org.partiql.lang.eval.builtins
 
 import org.partiql.lang.eval.*
+import org.partiql.lang.errors.*
+import org.partiql.lang.util.*
 import java.util.UUID
 import java.util.Base64
 import java.security.MessageDigest
@@ -122,8 +124,7 @@ internal class ConcatExprFunction(private val valueFactory: ExprValueFactory): E
         for (i in args) {
             index++;
             if (i.type != ExprValueType.STRING) {
-                errNoContext("Argument "+index+" of concat was not STRING.",
-                                                                                internal = false)
+                errNoContext("Argument "+index+" of concat was not STRING.",  internal = false)
             }
             result+=i.stringValue();
         }
@@ -148,7 +149,6 @@ internal class FlatListExprFunction(private val valueFactory: ExprValueFactory):
             } else {
                 list.add(i)
             }
-            
         }
         return valueFactory.newList(list)
     }
@@ -158,9 +158,8 @@ internal class ListExprFunction(private val valueFactory: ExprValueFactory): Exp
     override val name = "list"
     override fun call(env: Environment, args: List<ExprValue>): ExprValue {
         var list :MutableList<ExprValue> = mutableListOf<ExprValue>()
-        for (i in args) {
-            list.add(i)
-        }
+        for (i in args) { list.add(i) }
+        
         return valueFactory.newList(list)
     }
 }
@@ -177,8 +176,7 @@ internal class NumbytesExprFunction(valueFactory: ExprValueFactory): NullPropaga
 
 internal class NewuuidExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("newuuid", 0, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        val uuid: UUID? = UUID.randomUUID()
-        return valueFactory.newString(uuid.toString())
+        return valueFactory.newString(UUID.randomUUID().toString())
     }
 }
 
@@ -187,7 +185,7 @@ internal class LeadingPadExprFunction(valueFactory: ExprValueFactory) : NullProp
         when {
             args[0].type != ExprValueType.STRING                      -> errNoContext("Argument 1 of leading_pad was not STRING.",
                                                                                 internal = false)
-            args[1].type!= ExprValueType.INT                          -> errNoContext("Argument 2 of leading_pad was not INTEGER.",
+            args[1].type!= ExprValueType.INT                          -> errNoContext("Argument 2 of leading_pad was not INT.",
                                                                                 internal = false)
             args.size == 3 && args[2].type != ExprValueType.STRING    -> errNoContext("Argument 3 of leading_pad was not STRING.",
                                                                                 internal = false)                                                                    
@@ -212,7 +210,7 @@ internal class TrailingPadExprFunction(valueFactory: ExprValueFactory) : NullPro
         when {
             args[0].type != ExprValueType.STRING                -> errNoContext("Argument 1 of trailing_pad was not STRING.",
                                                                                 internal = false)
-            args[1].type != ExprValueType.INT                   -> errNoContext("Argument 2 of trailing_pad was not INTEGER.",
+            args[1].type != ExprValueType.INT                   -> errNoContext("Argument 2 of trailing_pad was not INT.",
                                                                                 internal = false)
             args.size == 3 && args[2].type != ExprValueType.STRING                -> errNoContext("Argument 3 of trailing_pad was not STRING.",
                                                                                 internal = false)                                                                    
@@ -234,9 +232,70 @@ internal class TrailingPadExprFunction(valueFactory: ExprValueFactory) : NullPro
 internal class ChrExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("chr", 1, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         return when {
-            args[0].type != ExprValueType.INT                -> errNoContext("Argument 1 of chr was not INTEGER.",
+            args[0].type != ExprValueType.INT                -> errNoContext("Argument 1 of chr was not INT.",
                                                                                 internal = false)
             else -> valueFactory.newString(args[0].numberValue().toInt().toChar().toString())
+        }
+    }
+}
+
+internal class GetItemExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("get_item", 2, valueFactory) {
+    override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
+        val collection = args.first()
+        val indexValue = args[1]
+        
+        return when (collection.type) {
+            ExprValueType.STRUCT -> {
+                if (indexValue.type == ExprValueType.STRING) {
+                    val ionStruct = collection.ionValue as IonStruct
+                    valueFactory.newFromIonValue(ionStruct[indexValue.stringValue()])
+                } else {
+                    errNoContext("Argument 2 of get_item was not STRING.", internal = false)
+                }  
+            } 
+
+            ExprValueType.LIST -> {
+                if (indexValue.type == ExprValueType.INT) {
+                    val ionContainer = collection.ionValue as IonContainer
+                    val iter = ionContainer.iterator();
+                    val index = indexValue.intValue();
+                    var counter = 0;
+
+                    while (iter.hasNext()){
+                        if (counter == index) {
+                            break;
+                        } else {
+                            iter.next();
+                            counter++
+                        }
+                    }
+                    valueFactory.newFromIonValue(iter.next())
+                } else {
+                    errNoContext("Argument 2 of get_item was not INT.", internal = false)
+                }  
+            }
+
+            ExprValueType.STRING -> {
+                val index = indexValue.intValue();
+                if (indexValue.type == ExprValueType.INT) {
+                    val stringValue = collection.stringValue()
+                    valueFactory.newString(stringValue.get(index).toString())
+                } else {
+                    errNoContext("Argument 2 of get_item was not INT.", internal = false)
+                }  
+            }
+
+            else               -> {
+                val errorContext = PropertyValueMap()
+                errorContext[Property.EXPECTED_ARGUMENT_TYPES] = "LIST or BAG or STRUCT"
+                errorContext[Property.ACTUAL_ARGUMENT_TYPES] = collection.type.name
+                errorContext[Property.FUNCTION_NAME] = "get_item"
+
+                err(message = "invalid argument type for get_item",
+                    errorCode = ErrorCode.EVALUATOR_INCORRECT_TYPE_OF_ARGUMENTS_TO_FUNC_CALL,
+                    errorContext = errorContext,
+                    internal = false)
+            }
         }
     }
 }
@@ -244,11 +303,11 @@ internal class ChrExprFunction(valueFactory: ExprValueFactory) : NullPropagating
 internal class EncodeExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("encode", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         return when {
-            args[0].type != ExprValueType.STRING                      -> errNoContext("Argument 1 of encode was not STRING.",
+            args[0].type != ExprValueType.STRING                            -> errNoContext("Argument 1 of encode was not STRING.",
                                                                                 internal = false)
-            args[1].type != ExprValueType.STRING                      -> errNoContext("Argument 2 of encode was not STRING.",
+            args[1].type != ExprValueType.STRING                            -> errNoContext("Argument 2 of encode was not STRING.",
                                                                                 internal = false)
-            !(args[1].stringValue().toUpperCase().equals("BASE64"))   -> errNoContext("Argument 2 of encode must Base64.",
+            args[1].stringValue().toUpperCase().equals("BASE64") == false   -> errNoContext("Argument 2 of encode must Base64.",
                                                                                 internal = false)
             else -> valueFactory.newString(Base64.getEncoder().encodeToString(args[0].stringValue().toByteArray()))
         }
@@ -258,11 +317,11 @@ internal class EncodeExprFunction(valueFactory: ExprValueFactory) : NullPropagat
 internal class DecodeExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("decode", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         return when {
-            args[0].type != ExprValueType.STRING                      -> errNoContext("Argument 1 of decode was not STRING.",
+            args[0].type != ExprValueType.STRING                            -> errNoContext("Argument 1 of decode was not STRING.",
                                                                                 internal = false)
-            args[1].type != ExprValueType.STRING                      -> errNoContext("Argument 2 of decode was not STRING.",
+            args[1].type != ExprValueType.STRING                            -> errNoContext("Argument 2 of decode was not STRING.",
                                                                                 internal = false)
-            !(args[1].stringValue().toUpperCase().equals("BASE64"))   -> errNoContext("Argument 2 of decode must Base64.",
+            args[1].stringValue().toUpperCase().equals("BASE64") == false   -> errNoContext("Argument 2 of decode must Base64.",
                                                                                 internal = false)
             else -> valueFactory.newString(String(Base64.getDecoder().decode(args[0].stringValue())))
         }
@@ -281,9 +340,9 @@ internal class HashExprFunction(valueFactory: ExprValueFactory) : NullPropagatin
         val hashType = args[1].stringValue().toUpperCase()
 
         return when {
-            !(hashType.equals("MD2") || hashType.equals("MD5") || hashType.equals("SHA-1") || hashType.equals("SHA-224")
-            || hashType.equals("SHA-256") || hashType.equals("SHA-384") || hashType.equals("SHA-512"))                        -> errNoContext("Argument 2 of encrypt invalid encrypt type.",
-                                                                                internal = false)
+            (hashType.equals("MD2") || hashType.equals("MD5") || hashType.equals("SHA-1") || hashType.equals("SHA-224")
+            || hashType.equals("SHA-256") || hashType.equals("SHA-384") || hashType.equals("SHA-512"))  == false 
+                                  -> errNoContext("Argument 2 of encrypt invalid encrypt type.", internal = false)
             else -> valueFactory.newString(hashString(args[0].stringValue(), hashType))
         }
     }

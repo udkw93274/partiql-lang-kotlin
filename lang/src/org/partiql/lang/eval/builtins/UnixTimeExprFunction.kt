@@ -34,7 +34,7 @@ internal class UnixtimeToStringExprFunction(valueFactory: ExprValueFactory): Nul
                                                                                 internal = false)
             args[1].type != ExprValueType.STRING                      -> errNoContext("Argument 2 of unixtime_to_string was not STRING.",
                                                                                 internal = false)
-            args.size > 2 && args[2].type != ExprValueType.STRING  -> errNoContext("Argument 3 of unixtime_to_string was not STRING.",
+            args.size > 2 && args[2].type != ExprValueType.STRING     -> errNoContext("Argument 3 of unixtime_to_string was not STRING.",
                                                                                 internal = false)
         }
         
@@ -166,21 +166,6 @@ internal class AddTimeExprFunction(valueFactory: ExprValueFactory) : NullPropaga
     }
 }
 
-/**
- * Difference in date parts between two timestamps. If the first timestamp is later than the second the result is negative.
- *
- * Syntax: `DATE_DIFF(<date part>, <timestamp>, <timestamp>)`
- * Where date part is one of the following keywords: `year, month, day, hour, minute, second`
- *
- * Timestamps without all date parts are considered to be in the beginning of the missing parts to make calculation possible.
- * For example:
- * - 2010T is interpreted as 2010-01-01T00:00:00.000Z
- * - date_diff(month, `2010T`, `2010-05T`) results in 4
- *
- * If one of the timestamps has a time component then they are a day apart only if they are 24h apart, examples:
- * - date_diff(day, `2010-01-01T`, `2010-01-02T`) results in 1
- * - date_diff(day, `2010-01-01T23:00Z`, `2010-01-02T01:00Z`) results in 0 as they are only 2h apart
- */
 internal class DiffTimeExprFunction(valueFactory: ExprValueFactory) : NullPropagatingExprFunction("diff_time", 3, valueFactory) {
 
     // Since we don't have a date part for `milliseconds` we can safely set the OffsetDateTime to 0 as it won't

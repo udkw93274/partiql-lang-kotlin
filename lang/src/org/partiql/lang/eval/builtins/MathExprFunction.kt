@@ -22,7 +22,7 @@ internal class AbsExprFunction(valueFactory: ExprValueFactory): NullPropagatingE
         return when (args[0].type) {
             ExprValueType.INT -> valueFactory.newInt(abs(args[0].numberValue().toInt()))
             ExprValueType.DECIMAL, ExprValueType.FLOAT -> valueFactory.newFloat(abs(args[0].numberValue().toDouble()))
-            else -> errNoContext("Argument 1 of abs was not Number.", internal = false)
+            else -> errNoContext("Argument 1 of abs was not NUMBER.", internal = false)
         }
     }
 }
@@ -30,7 +30,7 @@ internal class AbsExprFunction(valueFactory: ExprValueFactory): NullPropagatingE
 internal class SignExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("sign", 1, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         return when {
-            args[0].type.isNumber == false -> errNoContext("Argument 1 of sign was not Number.", internal = false)
+            args[0].type.isNumber == false -> errNoContext("Argument 1 of sign was not NUMBER.", internal = false)
             else  -> valueFactory.newInt(sign(args[0].numberValue().toDouble()).toInt())
         }
     }
@@ -41,7 +41,7 @@ internal class CeilExprFunction(valueFactory: ExprValueFactory): NullPropagating
         return when (args[0].type) {
             ExprValueType.INT -> args[0]
             ExprValueType.DECIMAL, ExprValueType.FLOAT -> valueFactory.newInt(ceil(args[0].numberValue().toDouble()).toInt())
-            else -> errNoContext("Argument 1 of ceil was not Number.", internal = false)
+            else -> errNoContext("Argument 1 of ceil was not NUMBER.", internal = false)
         }
     }
 }
@@ -51,7 +51,7 @@ internal class FloorExprFunction(valueFactory: ExprValueFactory): NullPropagatin
         return when (args[0].type) {
             ExprValueType.INT -> args[0]
             ExprValueType.DECIMAL, ExprValueType.FLOAT -> valueFactory.newInt(floor(args[0].numberValue().toDouble()).toInt())
-            else -> errNoContext("Argument 1 of floor was not Number.", internal = false)
+            else -> errNoContext("Argument 1 of floor was not NUMBER.", internal = false)
         }
     }
 }
@@ -61,35 +61,24 @@ internal class RoundExprFunction(valueFactory: ExprValueFactory): NullPropagatin
         return when (args[0].type) {
             ExprValueType.INT -> args[0]
             ExprValueType.DECIMAL, ExprValueType.FLOAT -> valueFactory.newInt(args[0].numberValue().toDouble().roundToInt())
-            else -> errNoContext("Argument 1 of round was not Number.", internal = false)
+            else -> errNoContext("Argument 1 of round was not NUMBER.", internal = false)
         }
     }
 }
 
 internal class TruncExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("trunc", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        
-
-        when {
-            args[0].type.isNumber == false                   -> errNoContext("Argument 1 of trunc was not Number.",
+        return when {
+            args[1].type != ExprValueType.INT                 -> errNoContext("Argument 2 of trunc was not INT.",
                                                                                 internal = false)
-            args[1].type.isNumber == false                  -> errNoContext("Argument 2 of trunc was not Number.",
-                                                                                internal = false)
-        }
-        
-        var secondValueDouble = args[1].numberValue().toDouble()
-
-        when {
-            secondValueDouble < 0                 -> secondValueDouble = 0.0
-            args[1].type != ExprValueType.INT       -> secondValueDouble = floor(secondValueDouble)
-        }
-
-        val divider = Math.pow(10.0, secondValueDouble)
-
-        return when (args[0].type) {
-            ExprValueType.INT -> args[0]
-            ExprValueType.DECIMAL, ExprValueType.FLOAT -> valueFactory.newFloat(floor(args[0].numberValue().toDouble() * divider) / divider)
-            else -> errNoContext("Argument 1 of trunc was not Number.", internal = false)
+            args[0].type == ExprValueType.INT                 -> args[0]
+            args[0].type == ExprValueType.DECIMAL || args[0].type == ExprValueType.FLOAT -> {
+                var secondValue = args[1].numberValue().toDouble()
+                if (secondValue < 0) { secondValue = 0.0 }
+                val divider = Math.pow(10.0, secondValue)
+                valueFactory.newFloat(floor(args[0].numberValue().toDouble() * divider) / divider)
+            }
+            else                                              -> errNoContext("Argument 1 of trunc was not NUMBER.", internal = false)
         }
     }
 }
@@ -97,11 +86,11 @@ internal class TruncExprFunction(valueFactory: ExprValueFactory): NullPropagatin
 internal class ModExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("mod", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         return when {
-            args[0].type != ExprValueType.INT                   -> errNoContext("Argument 1 of mod was not INTEGER.",
+            args[0].type != ExprValueType.INT                   -> errNoContext("Argument 1 of mod was not INT.",
                                                                                 internal = false)
-            args[1].type != ExprValueType.INT                   -> errNoContext("Argument 2 of mod was not INTEGER.",
+            args[1].type != ExprValueType.INT                   -> errNoContext("Argument 2 of mod was not INT.",
                                                                                 internal = false)
-            args[1].numberValue().toInt() == 0                  -> errNoContext("Argument 2 must not be 0.",
+            args[1].numberValue().toInt() == 0                  -> errNoContext("Argument 2 of mod must not be 0.",
                                                                                 internal = false)
             else -> valueFactory.newInt(args[0].numberValue().toInt() % args[1].numberValue().toInt())
         }
@@ -112,7 +101,7 @@ internal class SqrtExprFunction(valueFactory: ExprValueFactory): NullPropagating
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         return when {
             args[0].type.isNumber -> valueFactory.newFloat(sqrt(args[0].numberValue().toDouble()))
-            else -> errNoContext("Argument 1 of sqrt was not Number.", internal = false)
+            else -> errNoContext("Argument 1 of sqrt was not NUMBER.", internal = false)
         }
     }
 }
@@ -120,8 +109,8 @@ internal class SqrtExprFunction(valueFactory: ExprValueFactory): NullPropagating
 internal class PowerExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("power", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         return when {
-            args[0].type.isNumber == false -> errNoContext("Argument 1 of power was not Number.", internal = false)
-            args[1].type.isNumber == false -> errNoContext("Argument 2 of power was not Number.", internal = false)
+            args[0].type.isNumber == false -> errNoContext("Argument 1 of power was not NUMBER.", internal = false)
+            args[1].type.isNumber == false -> errNoContext("Argument 2 of power was not NUMBER.", internal = false)
             else -> valueFactory.newFloat(Math.pow(args[0].numberValue().toDouble(), args[1].numberValue().toDouble()))
         }
     }
@@ -129,10 +118,17 @@ internal class PowerExprFunction(valueFactory: ExprValueFactory): NullPropagatin
 
 internal class LogExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("log", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
+        when {
+            args[0].type.isNumber == false -> errNoContext("Argument 1 of log was not NUMBER.", internal = false)
+            args[1].type.isNumber == false -> errNoContext("Argument 2 of log was not NUMBER.", internal = false)
+        }
+        val targetNumber = args[0].numberValue().toDouble()
+        val base = args[1].numberValue().toDouble()
         return when {
-            args[0].type.isNumber == false -> errNoContext("Argument 1 of log was not Number.", internal = false)
-            args[1].type.isNumber == false -> errNoContext("Argument 2 of log was not Number.", internal = false)
-            else -> valueFactory.newFloat(log(args[0].numberValue().toDouble(), args[1].numberValue().toDouble()))
+            targetNumber == 0.0 -> valueFactory.newString("-inf")
+            targetNumber < 0.0 || base <= 0.0 || base == 1.0 -> valueFactory.newString("nan")
+            targetNumber == 1.0 -> valueFactory.newFloat(0.0)
+            else -> valueFactory.newFloat(log(targetNumber, base))
         }
     }
 }
@@ -141,16 +137,21 @@ internal class ExpExprFunction(valueFactory: ExprValueFactory): NullPropagatingE
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         return when {
             args[0].type.isNumber -> valueFactory.newFloat(exp(args[0].numberValue().toDouble()))
-            else -> errNoContext("Argument 1 of exp not Number.", internal = false)
+            else -> errNoContext("Argument 1 of exp not NUMBER.", internal = false)
         }
     }
 }
 
 internal class LnExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("ln", 1, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
-        return when {
-            args[0].type.isNumber -> valueFactory.newFloat(ln(args[0].numberValue().toDouble()))
-            else -> errNoContext("Argument 1 of ln was not Number.", internal = false)
+        if (args[0].type.isNumber) {
+            return when {
+                args[0].numberValue().toDouble() < 0.0 -> valueFactory.newString("nan")
+                args[0].numberValue().toDouble() == 0.0 -> valueFactory.newString("-inf")
+                else -> valueFactory.newFloat(ln(args[0].numberValue().toDouble()))
+            }
+        } else {
+            errNoContext("Argument 1 of ln was not NUMBER.", internal = false)
         }
     }
 }
@@ -174,8 +175,8 @@ internal class RandExprFunction(valueFactory: ExprValueFactory): NullPropagating
 internal class BitORExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("bitor", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         return when {
-            args[0].type != ExprValueType.INT -> errNoContext("Argument 1 of bitor was not INTEGER.", internal = false)
-            args[1].type != ExprValueType.INT -> errNoContext("Argument 2 of bitor was not INTEGER.", internal = false)
+            args[0].type != ExprValueType.INT -> errNoContext("Argument 1 of bitor was not INT.", internal = false)
+            args[1].type != ExprValueType.INT -> errNoContext("Argument 2 of bitor was not INT.", internal = false)
             else -> valueFactory.newInt(args[0].numberValue().toInt() or args[1].numberValue().toInt())
         }
     }
@@ -184,8 +185,8 @@ internal class BitORExprFunction(valueFactory: ExprValueFactory): NullPropagatin
 internal class BitANDExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("bitand", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         return when {
-            args[0].type != ExprValueType.INT -> errNoContext("Argument 1 of bitand was not INTEGER.", internal = false)
-            args[1].type != ExprValueType.INT -> errNoContext("Argument 2 of bitand was not INTEGER.", internal = false)
+            args[0].type != ExprValueType.INT -> errNoContext("Argument 1 of bitand was not INT.", internal = false)
+            args[1].type != ExprValueType.INT -> errNoContext("Argument 2 of bitand was not INT.", internal = false)
             else -> valueFactory.newInt(args[0].numberValue().toInt() and args[1].numberValue().toInt())
         }
     }
@@ -194,8 +195,8 @@ internal class BitANDExprFunction(valueFactory: ExprValueFactory): NullPropagati
 internal class BitXORExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("bitxor", 2, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue {
         return when {
-            args[0].type != ExprValueType.INT -> errNoContext("Argument 1 of bitxor was not INTEGER.", internal = false)
-            args[1].type != ExprValueType.INT -> errNoContext("Argument 2 of bitxor was not INTEGER.", internal = false)
+            args[0].type != ExprValueType.INT -> errNoContext("Argument 1 of bitxor was not INT.", internal = false)
+            args[1].type != ExprValueType.INT -> errNoContext("Argument 2 of bitxor was not INT.", internal = false)
             else -> valueFactory.newInt(args[0].numberValue().toInt() xor args[1].numberValue().toInt())
         }
     }
@@ -244,7 +245,7 @@ internal class AtanhExprFunction(valueFactory: ExprValueFactory): NullPropagatin
 internal class Atan2ExprFunction(valueFactory: ExprValueFactory): NullPropagatingExprFunction("atan2", 1, valueFactory) {
     override fun eval(env: Environment, args: List<ExprValue>): ExprValue { 
         return when {
-            args[1].type.isNumber == false -> errNoContext("Argument 2 of atan2 was not Number.", internal = false)
+            args[1].type.isNumber == false -> errNoContext("Argument 2 of atan2 was not NUMBER.", internal = false)
             else -> valueFactory.newFloat(atan2(extractArguments(args[0], "atan2"), args[1].numberValue().toDouble())) 
         }
     }
@@ -252,7 +253,7 @@ internal class Atan2ExprFunction(valueFactory: ExprValueFactory): NullPropagatin
 
 private fun extractArguments(input: ExprValue, functionName: String): Double {
     return when {
-        input.type.isNumber == false -> errNoContext("Argument 1 of "+functionName+" was not Number.", internal = false)
+        input.type.isNumber == false -> errNoContext("Argument 1 of "+functionName+" was not NUMBER.", internal = false)
         else -> input.numberValue().toDouble()
     }
 }

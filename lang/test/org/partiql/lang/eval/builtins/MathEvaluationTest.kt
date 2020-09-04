@@ -64,10 +64,10 @@ class MathEvaluationTest : EvaluatorTestBase() {
     fun truncFloat() = assertEval("trunc(2.00, 5)", "2e0")
 
     @Test
-    fun truncSecondFloat() = assertEval("trunc(2.12, 1.2)", "2.1e0")
+    fun truncSecondFloat() = assertEval("trunc(2.12, 1)", "2.1e0")
 
     @Test
-    fun truncSecondNegative() = assertEval("trunc(2.12, -1.2)", "2e0")
+    fun truncSecondNegative() = assertEval("trunc(2.12, -1)", "2e0")
     
     @Test
     fun truncInt() = assertEval("trunc(2, 5)", "2")
@@ -88,13 +88,43 @@ class MathEvaluationTest : EvaluatorTestBase() {
     fun powerNegative() = assertEval("power(10, -1)", "0.1e0")
 
     @Test
-    fun log() = assertEval("log(100, 10)", "2e0")
+    fun logTarget0() = assertEval("log(0, 100)", "\"-inf\"")
+
+    @Test
+    fun nanvllog() = assertEval("nanvl(log(0,100), 3)", "3")
+
+    @Test
+    fun logTarget1() = assertEval("log(1, 100)", "0e0")
+
+    @Test
+    fun logTargetMinus() = assertEval("log(-1, 100)", "\"nan\"")
+
+    @Test
+    fun logBase0() = assertEval("log(10, 0)", "\"nan\"")
+
+    @Test
+    fun logBase1() = assertEval("log(10, 0)", "\"nan\"")
+    
+    @Test
+    fun logBaseMinus() = assertEval("log(10, -2)", "\"nan\"")
 
     @Test
     fun exp() = assertEval("exp(0)", "1e0")
     
     @Test
     fun ln() = assertEval("ln(10)", "2.302585092994046e0")
+    
+    @Test
+    fun lnMinus() = assertEval("ln(-1)", "\"nan\"")
+    
+    @Test
+    fun ln1() = assertEval("ln(1)", "0e0")
+
+    @Test
+    fun ln0() = assertEval("ln(0)", "\"-inf\"")
+
+    @Test
+    fun nanvlln() = assertEval("nanvl(ln(-1), 3)", "3")
 
     @Test
     fun nanvlNumber() = assertEval("nanvl(1.1, 3)", "1.1")
